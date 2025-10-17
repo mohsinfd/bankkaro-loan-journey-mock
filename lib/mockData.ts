@@ -52,6 +52,7 @@ export interface LenderRule {
   priority: number;
   icon: string;
   color: string;
+  employment_types?: string[];
 }
 
 export interface PreApprovedOffer {
@@ -227,7 +228,8 @@ const lenderRules: LenderRule[] = [
     roi_max: 24,
     priority: 10,
     icon: 'fibe',
-    color: '#2563eb'
+    color: '#2563eb',
+    employment_types: ['Salaried', 'Self-Employed']
   },
   {
     lender_id: 'lt_finance',
@@ -246,7 +248,8 @@ const lenderRules: LenderRule[] = [
     roi_max: 22,
     priority: 20,
     icon: 'lt',
-    color: '#dc2626'
+    color: '#dc2626',
+    employment_types: ['Salaried']
   },
   {
     lender_id: 'hdfc_bank',
@@ -265,7 +268,8 @@ const lenderRules: LenderRule[] = [
     roi_max: 20,
     priority: 5,
     icon: 'hdfc',
-    color: '#059669'
+    color: '#059669',
+    employment_types: ['Salaried']
   },
   {
     lender_id: 'bajaj_finserv',
@@ -284,7 +288,8 @@ const lenderRules: LenderRule[] = [
     roi_max: 22,
     priority: 15,
     icon: 'bajaj',
-    color: '#7c3aed'
+    color: '#7c3aed',
+    employment_types: ['Salaried', 'Self-Employed']
   }
 ];
 
