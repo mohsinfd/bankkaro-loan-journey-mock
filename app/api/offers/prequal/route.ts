@@ -18,13 +18,13 @@ export async function POST(request: NextRequest) {
       db = new ServerlessDatabaseService();
       
       // Get all lender rules and pre-approved offers
-      const lenders = db.getAllLenderRules();
-      const paOffers = db.getPreApprovedOffers(phoneNumber);
+      const lenders = db!.getAllLenderRules();
+      const paOffers = db!.getPreApprovedOffers(phoneNumber);
       
       // Evaluate each lender using BRE logic
       const evaluations = lenders.map(lender => {
         const paOffer = paOffers.find(pa => pa.lender_id === lender.lender_id);
-        return db.evaluateLender(scrubData, lender, paOffer);
+        return db!.evaluateLender(scrubData, lender, paOffer);
       });
       
       // Separate PA and PQ offers
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       db = new ServerlessDatabaseService();
       
       // Get all lender rules
-      const lenders = db.getAllLenderRules();
+      const lenders = db!.getAllLenderRules();
       
       // Filter lenders based on basic criteria
       const eligibleLenders = lenders.filter(lender =>

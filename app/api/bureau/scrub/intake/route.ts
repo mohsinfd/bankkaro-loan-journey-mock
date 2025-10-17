@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     db = new ServerlessDatabaseService();
     
     // Get latest scrub data from database
-    const scrubData = db.getLatestScrubData(phoneNumber);
+    const scrubData = db!.getLatestScrubData(phoneNumber);
     
     // Scenario C: No scrub data found
     if (!scrubData) {
