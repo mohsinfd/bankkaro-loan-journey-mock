@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import DatabaseService from '@/lib/database';
 
 export async function POST(request: NextRequest) {
-  let db = null;
+  let db: DatabaseService | null = null;
   
   try {
     const body = await request.json();
