@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
       
       // Sort offers: PA first (by ROI), then PQ (by ROI), then ineligible
       const sortedOffers = [
-        ...paOffersResult.sort((a, b) => a.roi - b.roi),
-        ...pqOffers.sort((a, b) => a.roi - b.roi),
+        ...paOffersResult.sort((a, b) => (a.roi || 0) - (b.roi || 0)),
+        ...pqOffers.sort((a, b) => (a.roi || 0) - (b.roi || 0)),
         ...ineligibleOffers
       ];
       
