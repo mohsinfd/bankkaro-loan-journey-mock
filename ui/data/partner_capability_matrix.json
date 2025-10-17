@@ -1,0 +1,38 @@
+{
+  "fibe_nbfc": {
+    "dpd_allowed_12m": 1,
+    "enquiries_3m_cap": 5,
+    "foir_cap": 0.5,
+    "accepts_ntc": true,
+    "serviceable_pincodes": ["all"],
+    "max_tenure_months": 60,
+    "min_tenure_months": 12
+  },
+  "lt_finance": {
+    "dpd_allowed_12m": 0,
+    "enquiries_3m_cap": 3,
+    "foir_cap": 0.45,
+    "accepts_ntc": false,
+    "serviceable_pincodes": ["all"],
+    "max_tenure_months": 48,
+    "min_tenure_months": 12
+  },
+  "hdfc_bank": {
+    "dpd_allowed_12m": 0,
+    "enquiries_3m_cap": 2,
+    "foir_cap": 0.4,
+    "accepts_ntc": false,
+    "serviceable_pincodes": ["all"],
+    "max_tenure_months": 72,
+    "min_tenure_months": 12
+  },
+  "bajaj_finserv": {
+    "dpd_allowed_12m": 1,
+    "enquiries_3m_cap": 4,
+    "foir_cap": 0.48,
+    "accepts_ntc": true,
+    "serviceable_pincodes": ["all"],
+    "max_tenure_months": 60,
+    "min_tenure_months": 12
+  }
+}

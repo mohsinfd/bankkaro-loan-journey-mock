@@ -1,0 +1,33 @@
+{
+  "+919876543214": [
+    {
+      "lender_id": "fibe_nbfc",
+      "amount": 250000,
+      "roi": 12,
+      "tenure_months": [12, 24, 36, 48],
+      "processing_fee": 2500,
+      "approval_probability": 95,
+      "features": ["Guaranteed approval", "No documentation", "Instant disbursement"]
+    }
+  ],
+  "+919876543215": [
+    {
+      "lender_id": "fibe_nbfc",
+      "amount": 300000,
+      "roi": 11,
+      "tenure_months": [12, 24, 36, 48, 60],
+      "processing_fee": 3000,
+      "approval_probability": 98,
+      "features": ["Guaranteed approval", "No documentation", "Instant disbursement", "No prepayment charges"]
+    },
+    {
+      "lender_id": "bajaj_finserv",
+      "amount": 400000,
+      "roi": 13,
+      "tenure_months": [12, 24, 36, 48],
+      "processing_fee": 4000,
+      "approval_probability": 95,
+      "features": ["Pre-approved amount", "Fast processing", "Flexible EMI"]
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "id": "scenario_a",
+    "name": "Rohit Sharma",
+    "phone": "+919812345678",
+    "scenario": "A: PQ Success – clean profile",
+    "description": "Excellent credit profile with score 785, no DPD, low enquiries. Should get 3+ eligible lenders.",
+    "preview": {
+      "score": 785,
+      "income": 60000,
+      "dpd": 0,
+      "enquiries": 2
+    }
+  },
+  {
+    "id": "scenario_b", 
+    "name": "Anita Desai",
+    "phone": "+919811234567",
+    "scenario": "B: PQ Failed – low score & DPD",
+    "description": "Poor credit profile with score 645, DPD issues, high enquiries. Should get 0 eligible lenders.",
+    "preview": {
+      "score": 645,
+      "income": 40000,
+      "dpd": 2,
+      "enquiries": 5
+    }
+  },
+  {
+    "id": "scenario_c",
+    "name": "Mohammed Iqbal", 
+    "phone": "+919876543210",
+    "scenario": "C: PQ Failed – high enquiries",
+    "description": "Good score but high enquiries exceeding lender caps. Should get limited eligible lenders.",
+    "preview": {
+      "score": 720,
+      "income": 25000,
+      "dpd": 0,
+      "enquiries": 8
+    }
+  },
+  {
+    "id": "scenario_d",
+    "name": "Leena Kapoor",
+    "phone": "+919812367890", 
+    "scenario": "D: Stale Scrub (>90d)",
+    "description": "Good profile but data is stale (>90 days old). Should show greyed out offers.",
+    "preview": {
+      "score": 710,
+      "income": 48000,
+      "dpd": 0,
+      "enquiries": 1
+    }
+  },
+  {
+    "id": "scenario_e",
+    "name": "Vikas Jain",
+    "phone": "+919876512345",
+    "scenario": "E: NTC user",
+    "description": "New to credit with no score. Should only get NTC-accepting lenders.",
+    "preview": {
+      "score": null,
+      "income": 30000,
+      "dpd": 0,
+      "enquiries": 2
+    }
+  },
+  {
+    "id": "scenario_f",
+    "name": "Sneha Patel",
+    "phone": "+919867890123",
+    "scenario": "F: Pre-Approved candidate", 
+    "description": "Excellent profile with pre-approved offers. Should get 2+ PA offers + PQ offers.",
+    "preview": {
+      "score": 760,
+      "income": 80000,
+      "dpd": 0,
+      "enquiries": 1
+    }
+  }
+]

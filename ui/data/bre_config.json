@@ -1,0 +1,118 @@
+{
+  "lenders": [
+    {
+      "lender_id": "fibe_nbfc",
+      "lender_name": "Fibe",
+      "min_score": 700,
+      "min_income": 20000,
+      "dpd_allowed_12m": 1,
+      "max_age": 65,
+      "min_age": 21,
+      "employment_types": ["Salaried", "Self-Employed"],
+      "max_loan_amount": 500000,
+      "min_loan_amount": 10000,
+      "base_roi": 14,
+      "max_roi": 24,
+      "processing_fee": 2,
+      "tenure_months": [12, 24, 36, 48, 60],
+      "icon": "fibe",
+      "color": "#2563eb",
+      "accepts_ntc": true,
+      "foir_cap": 0.5,
+      "enquiries_3m_cap": 5
+    },
+    {
+      "lender_id": "lt_finance",
+      "lender_name": "L&T Finance",
+      "min_score": 680,
+      "min_income": 25000,
+      "dpd_allowed_12m": 0,
+      "max_age": 60,
+      "min_age": 22,
+      "employment_types": ["Salaried"],
+      "max_loan_amount": 800000,
+      "min_loan_amount": 15000,
+      "base_roi": 16,
+      "max_roi": 26,
+      "processing_fee": 1.5,
+      "tenure_months": [12, 24, 36, 48],
+      "icon": "lt",
+      "color": "#059669",
+      "accepts_ntc": false,
+      "foir_cap": 0.45,
+      "enquiries_3m_cap": 3
+    },
+    {
+      "lender_id": "hdfc_bank",
+      "lender_name": "HDFC Bank",
+      "min_score": 750,
+      "min_income": 30000,
+      "dpd_allowed_12m": 0,
+      "max_age": 65,
+      "min_age": 21,
+      "employment_types": ["Salaried"],
+      "max_loan_amount": 1000000,
+      "min_loan_amount": 25000,
+      "base_roi": 12,
+      "max_roi": 22,
+      "processing_fee": 1,
+      "tenure_months": [12, 24, 36, 48, 60, 72],
+      "icon": "hdfc",
+      "color": "#dc2626",
+      "accepts_ntc": false,
+      "foir_cap": 0.4,
+      "enquiries_3m_cap": 2
+    },
+    {
+      "lender_id": "bajaj_finserv",
+      "lender_name": "Bajaj Finserv",
+      "min_score": 720,
+      "min_income": 25000,
+      "dpd_allowed_12m": 1,
+      "max_age": 65,
+      "min_age": 21,
+      "employment_types": ["Salaried", "Self-Employed"],
+      "max_loan_amount": 750000,
+      "min_loan_amount": 20000,
+      "base_roi": 15,
+      "max_roi": 25,
+      "processing_fee": 2.5,
+      "tenure_months": [12, 24, 36, 48, 60],
+      "icon": "bajaj",
+      "color": "#7c3aed",
+      "accepts_ntc": true,
+      "foir_cap": 0.48,
+      "enquiries_3m_cap": 4
+    }
+  ],
+  "fallback_rules": {
+    "min_income": 15000,
+    "max_age": 70,
+    "min_age": 18,
+    "allowed_pincodes": ["all"]
+  },
+  "bre_gates": {
+    "freshness_check": {
+      "max_days": 90,
+      "description": "Bureau data must be within 90 days"
+    },
+    "score_check": {
+      "description": "Credit score must meet lender minimum"
+    },
+    "dpd_check": {
+      "description": "Days past due must be within lender tolerance"
+    },
+    "enquiries_check": {
+      "description": "Recent enquiries must be within lender cap"
+    },
+    "income_check": {
+      "description": "Monthly income must meet lender minimum"
+    },
+    "foir_check": {
+      "description": "Fixed obligations to income ratio must be within cap"
+    },
+    "range_check": {
+      "description": "Loan amount and tenure must be within allowed ranges"
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "scrub_reference": "A12BCD34",
+  "evaluation_date": "2025-01-15T10:30:00Z",
+  "offers": [
+    {
+      "lender_id": "fibe_nbfc",
+      "lender_name": "Fibe",
+      "eligible": true,
+      "roi": 14,
+      "max_amount": 200000,
+      "processing_fee": 4000,
+      "tenure_available": [12, 24, 36, 48],
+      "approval_probability": 85,
+      "badge": "Pre-Qualified",
+      "reason": null,
+      "icon": "fibe",
+      "color": "#2563eb",
+      "features": ["Quick approval", "Low documentation", "Flexible tenure"]
+    },
+    {
+      "lender_id": "lt_finance",
+      "lender_name": "L&T Finance",
+      "eligible": true,
+      "roi": 16,
+      "max_amount": 150000,
+      "processing_fee": 2250,
+      "tenure_available": [12, 24, 36],
+      "approval_probability": 75,
+      "badge": "Pre-Qualified",
+      "reason": null,
+      "icon": "lt",
+      "color": "#059669",
+      "features": ["Low processing fee", "Fast disbursement", "No prepayment charges"]
+    },
+    {
+      "lender_id": "bajaj_finserv",
+      "lender_name": "Bajaj Finserv",
+      "eligible": true,
+      "roi": 15,
+      "max_amount": 180000,
+      "processing_fee": 4500,
+      "tenure_available": [12, 24, 36, 48],
+      "approval_probability": 80,
+      "badge": "Pre-Qualified",
+      "reason": null,
+      "icon": "bajaj",
+      "color": "#7c3aed",
+      "features": ["High loan amount", "Flexible EMI", "Digital process"]
+    },
+    {
+      "lender_id": "hdfc_bank",
+      "lender_name": "HDFC Bank",
+      "eligible": false,
+      "roi": null,
+      "max_amount": null,
+      "processing_fee": null,
+      "tenure_available": [],
+      "approval_probability": 0,
+      "badge": "Not Eligible",
+      "reason": "Credit score below minimum requirement",
+      "icon": "hdfc",
+      "color": "#dc2626",
+      "features": []
+    }
+  ],
+  "summary": {
+    "total_eligible": 3,
+    "total_lenders": 4,
+    "best_offer": {
+      "lender": "Fibe",
+      "roi": 14,
+      "amount": 200000
+    },
+    "estimated_emi_50k_36m": 1700,
+    "validity_days": 90
+  }
+}
