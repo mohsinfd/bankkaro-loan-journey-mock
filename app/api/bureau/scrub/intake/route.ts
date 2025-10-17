@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import DatabaseService from '@/lib/database';
+import ServerlessDatabaseService from '@/lib/serverlessDatabase';
 
 export async function POST(request: NextRequest) {
-  let db: DatabaseService | null = null;
+  let db: ServerlessDatabaseService | null = null;
   
   try {
     const body = await request.json();
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const phoneNumber = body.phone_number;
     
     // Initialize database connection
-    db = new DatabaseService();
+    db = new ServerlessDatabaseService();
     
     // Get latest scrub data from database
     const scrubData = db.getLatestScrubData(phoneNumber);

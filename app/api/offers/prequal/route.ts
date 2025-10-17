@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import DatabaseService from '@/lib/database';
+import ServerlessDatabaseService from '@/lib/serverlessDatabase';
 
 export async function POST(request: NextRequest) {
-  let db: DatabaseService | null = null;
+  let db: ServerlessDatabaseService | null = null;
   
   try {
     const body = await request.json();
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       const phoneNumber = scrubData.telephone;
       
       // Initialize database connection
-      db = new DatabaseService();
+      db = new ServerlessDatabaseService();
       
       // Get all lender rules and pre-approved offers
       const lenders = db.getAllLenderRules();
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       const fallbackData = body.fallback_data;
       
       // Initialize database connection
-      db = new DatabaseService();
+      db = new ServerlessDatabaseService();
       
       // Get all lender rules
       const lenders = db.getAllLenderRules();
