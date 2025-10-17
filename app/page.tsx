@@ -24,6 +24,9 @@ type PageData = {
   offer?: any;
   exitId?: string;
   redirectUrl?: string;
+  selectedUser?: any;
+  isStaleData?: boolean;
+  staleDays?: number;
 };
 
 export default function Home() {
