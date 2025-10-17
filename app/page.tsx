@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import CashKaroEntry from '@/ui/pages/cashkaro_entry';
 import BankKaroLogin from '@/ui/pages/bankkaro_login';
 import ScrubLoading from '@/ui/pages/scrub_loading';
+import LoanIntent from '@/ui/pages/loan_intent';
 import OfferList from '@/ui/pages/offer_list';
 import FallbackForm from '@/ui/pages/fallback_form';
 import OfferRedirect from '@/ui/pages/offer_redirect';
@@ -12,6 +13,7 @@ type PageState =
   | 'cashkaro_entry'
   | 'bankkaro_login'
   | 'scrub_loading'
+  | 'loan_intent'
   | 'offer_list'
   | 'fallback_form'
   | 'offer_redirect';
@@ -55,6 +57,15 @@ export default function Home() {
       
       case 'scrub_loading':
         return <ScrubLoading onNavigate={navigate} selectedUser={pageData.selectedUser} />;
+      
+      case 'loan_intent':
+        return (
+          <LoanIntent
+            onNavigate={navigate}
+            scrubData={pageData.scrubData}
+            selectedUser={pageData.selectedUser}
+          />
+        );
       
       case 'offer_list':
         return (

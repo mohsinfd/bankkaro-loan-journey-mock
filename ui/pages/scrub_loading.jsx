@@ -47,9 +47,9 @@ const ScrubLoading = ({ onNavigate, selectedUser }) => {
             timestamp: new Date().toISOString()
           });
           
-          // Navigate to offers
+          // Navigate to loan intent capture
           setTimeout(() => {
-            onNavigate('offer_list', { scrubData: data.data, selectedUser });
+            onNavigate('loan_intent', { scrubData: data.data, selectedUser });
           }, 1000);
         } else {
           setHasError(true);
@@ -62,9 +62,9 @@ const ScrubLoading = ({ onNavigate, selectedUser }) => {
           });
           
           if (data.error === 'stale_data') {
-            // For stale data, show offers but with stale flag
+            // For stale data, show loan intent with stale flag
             setTimeout(() => {
-              onNavigate('offer_list', { 
+              onNavigate('loan_intent', { 
                 scrubData: data.data, 
                 selectedUser, 
                 isStaleData: true,

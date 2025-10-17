@@ -158,19 +158,115 @@ export default class ServerlessDatabaseService {
     gates.push(incomeGate);
     if (!incomeGate.passed) reasonCodes.push("LOW_INCOME");
 
-    // Gate 7: FOIR Check
+    // Gate 7: FOIR Check (improved logic with safe defaults)
+    let foirCurrent = scrubData.foir_current;
+    let foirDescription = `FOIR: ${(foirCurrent * 100).toFixed(1)}%`;
+    
+    // If FOIR is not available, calculate safe default based on DPD and enquiries
+    if (!foirCurrent || foirCurrent === 0) {
+      if (scrubData.dpd_l12m === 0 && scrubData.total_enquiries_3m <= 3) {
+        // Clean profile - assume low existing EMI (10-15% of income)
+        foirCurrent = 0.12; // 12% of income as assumed EMI
+        foirDescription = `FOIR estimated: ${(foirCurrent * 100).toFixed(1)}% (clean profile, low assumed EMI)`;
+      } else {
+        // Riskier profile - assume higher existing EMI (15-20% of income)
+        foirCurrent = 0.18; // 18% of income as assumed EMI
+        foirDescription = `FOIR estimated: ${(foirCurrent * 100).toFixed(1)}% (DPD/enquiries present, higher assumed EMI)`;
+      }
+    }
+    
+    // Check against lender FOIR cap (only if lender has FOIR cap defined)
+    let foirGatePassed = true;
+    let foirGateDescription = foirDescription;
+    
+    if (lender.foir_cap && lender.foir_cap > 0) {
+      foirGatePassed = foirCurrent <= lender.foir_cap;
+      foirGateDescription = `${foirDescription} ${foirCurrent <= lender.foir_cap ? '≤' : '>'} ${(lender.foir_cap * 100).toFixed(1)}% cap`;
+    } else {
+      foirGateDescription = `${foirDescription} (no lender FOIR cap defined)`;
+    }
+    
     const foirGate = this.evaluateGate(
       "FOIR Check", 
-      scrubData.foir_current <= lender.foir_cap ? 1 : 0, 
+      foirGatePassed ? 1 : 0, 
       1,
-      `FOIR: ${(scrubData.foir_current * 100).toFixed(1)}% ${scrubData.foir_current <= lender.foir_cap ? '≤' : '>'} ${(lender.foir_cap * 100).toFixed(1)}% cap`
+      foirGateDescription
     );
     gates.push(foirGate);
     if (!foirGate.passed) reasonCodes.push("FOIR_EXCEEDED");
 
-    // Gate 8: Range Check (always passes for now)
-    const rangeGate = this.evaluateGate("Range Check", 1, 1, "Loan amount and tenure within allowed ranges");
+    // Gate 8: Range Check (amount and tenure validation)
+    let rangeGatePassed = true;
+    let rangeDescription = "Range validation: ";
+    let rangeReasons = [];
+    
+    // Check amount range if desired_amount is provided
+    if (scrubData.desired_amount) {
+      if (scrubData.desired_amount < lender.amount_min) {
+        rangeGatePassed = false;
+        rangeReasons.push(`Amount ₹${scrubData.desired_amount.toLocaleString()} < minimum ₹${lender.amount_min.toLocaleString()}`);
+      } else if (scrubData.desired_amount > lender.amount_max) {
+        rangeGatePassed = false;
+        rangeReasons.push(`Amount ₹${scrubData.desired_amount.toLocaleString()} > maximum ₹${lender.amount_max.toLocaleString()}`);
+      } else {
+        rangeReasons.push(`Amount ₹${scrubData.desired_amount.toLocaleString()} within range ₹${lender.amount_min.toLocaleString()}-₹${lender.amount_max.toLocaleString()}`);
+      }
+    }
+    
+    // Check tenure range if desired_tenure_months is provided
+    if (scrubData.desired_tenure_months) {
+      if (scrubData.desired_tenure_months < lender.tenure_min) {
+        rangeGatePassed = false;
+        rangeReasons.push(`Tenure ${scrubData.desired_tenure_months} months < minimum ${lender.tenure_min} months`);
+      } else if (scrubData.desired_tenure_months > lender.tenure_max) {
+        rangeGatePassed = false;
+        rangeReasons.push(`Tenure ${scrubData.desired_tenure_months} months > maximum ${lender.tenure_max} months`);
+      } else {
+        rangeReasons.push(`Tenure ${scrubData.desired_tenure_months} months within range ${lender.tenure_min}-${lender.tenure_max} months`);
+      }
+    }
+    
+    rangeDescription += rangeReasons.join(", ");
+    
+    const rangeGate = this.evaluateGate(
+      "Range Check", 
+      rangeGatePassed ? 1 : 0, 
+      1,
+      rangeDescription
+    );
     gates.push(rangeGate);
+    if (!rangeGate.passed) {
+      if (scrubData.desired_amount && (scrubData.desired_amount < lender.amount_min || scrubData.desired_amount > lender.amount_max)) {
+        reasonCodes.push("OUT_OF_RANGE_AMOUNT");
+        
+        // Log out-of-range analytics
+        console.log('out_of_range_triggered', {
+          lender_id: lender.lender_id,
+          lender_name: lender.lender_name,
+          type: 'amount',
+          user_amount: scrubData.desired_amount,
+          lender_min: lender.amount_min,
+          lender_max: lender.amount_max,
+          phone_number: scrubData.telephone,
+          timestamp: new Date().toISOString()
+        });
+      }
+      if (scrubData.desired_tenure_months && (scrubData.desired_tenure_months < lender.tenure_min || scrubData.desired_tenure_months > lender.tenure_max)) {
+        reasonCodes.push("OUT_OF_RANGE_TENURE");
+        
+        // Log out-of-range analytics
+        console.log('out_of_range_triggered', {
+          lender_id: lender.lender_id,
+          lender_name: lender.lender_name,
+          type: 'tenure',
+          user_tenure: scrubData.desired_tenure_months,
+          lender_min: lender.tenure_min,
+          lender_max: lender.tenure_max,
+          phone_number: scrubData.telephone,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
 
     const allGatesPassed = gates.every(gate => gate.passed);
 

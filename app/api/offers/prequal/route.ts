@@ -12,6 +12,37 @@ export async function POST(request: NextRequest) {
     
     if (body.scrub_data) {
       const scrubData = body.scrub_data;
+      
+      // Validate mandatory BRE input contract
+      const mandatoryFields = ['score', 'income_monthly', 'dpd_l12m', 'total_enquiries_3m', 'process_date'];
+      const missingFields = mandatoryFields.filter(field => 
+        scrubData[field] === undefined || scrubData[field] === null || scrubData[field] === ''
+      );
+      
+      if (missingFields.length > 0) {
+        return NextResponse.json({
+          success: false,
+          error: 'incomplete_inputs',
+          message: 'Missing mandatory fields for BRE evaluation',
+          missing_fields: missingFields,
+          required_fields: mandatoryFields,
+          fallback_form_required: true
+        }, { status: 400 });
+      }
+      
+      // Check if desired_amount and desired_tenure_months are provided
+      const hasLoanIntent = scrubData.desired_amount && scrubData.desired_tenure_months;
+      
+      if (!hasLoanIntent) {
+        return NextResponse.json({
+          success: false,
+          error: 'missing_loan_intent',
+          message: 'Loan amount and tenure preferences required',
+          required_fields: ['desired_amount', 'desired_tenure_months'],
+          fallback_form_required: true
+        }, { status: 400 });
+      }
+      
       const phoneNumber = scrubData.telephone;
       
       // Initialize database connection
@@ -38,6 +69,33 @@ export async function POST(request: NextRequest) {
         ...pqOffers.sort((a, b) => (a.roi || 0) - (b.roi || 0)),
         ...ineligibleOffers
       ];
+
+      // Log comprehensive BRE evaluation analytics
+      console.log('bre_evaluation_complete', {
+        phone_number: phoneNumber,
+        total_lenders_evaluated: evaluations.length,
+        pa_offers_count: paOffersResult.length,
+        pq_offers_count: pqOffers.length,
+        ineligible_count: ineligibleOffers.length,
+        desired_amount: scrubData.desired_amount,
+        desired_tenure: scrubData.desired_tenure_months,
+        evaluation_duration_ms: 1500, // Simulated delay
+        timestamp: new Date().toISOString()
+      });
+
+      // Log reason codes for analytics
+      const allReasonCodes = evaluations.flatMap(evaluation => evaluation.reason_codes || []);
+      const reasonCodeCounts = allReasonCodes.reduce((acc: Record<string, number>, code: string) => {
+        acc[code] = (acc[code] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      console.log('reason_codes_generated', {
+        phone_number: phoneNumber,
+        reason_code_counts: reasonCodeCounts,
+        total_reason_codes: allReasonCodes.length,
+        timestamp: new Date().toISOString()
+      });
       
       const evaluationResult = {
         scrub_reference: scrubData.memberreference,

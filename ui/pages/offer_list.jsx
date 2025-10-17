@@ -13,6 +13,11 @@ const OfferList = ({ onNavigate, scrubData, fallbackData, isFallback = false, se
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [apiCalls, setApiCalls] = useState([]);
+  const [isRecalculating, setIsRecalculating] = useState(false);
+  const [loanPreferences, setLoanPreferences] = useState({
+    desired_amount: scrubData?.desired_amount || 0,
+    desired_tenure_months: scrubData?.desired_tenure_months || 36
+  });
 
   useEffect(() => {
     const fetchOffers = async () => {
@@ -109,6 +114,82 @@ const OfferList = ({ onNavigate, scrubData, fallbackData, isFallback = false, se
     setError(null);
     // Trigger re-evaluation
     window.location.reload();
+  };
+
+  const handleMicroRecalculate = async () => {
+    setIsRecalculating(true);
+    
+    try {
+      // Update scrub data with new preferences
+      const updatedScrubData = {
+        ...scrubData,
+        desired_amount: loanPreferences.desired_amount,
+        desired_tenure_months: loanPreferences.desired_tenure_months
+      };
+      
+      // Track API call
+      const startTime = Date.now();
+      const apiCall = {
+        endpoint: '/api/offers/prequal',
+        method: 'POST',
+        request: { scrub_data: updatedScrubData },
+        timestamp: new Date().toISOString(),
+        status: 'pending',
+        type: 'micro_recalculate'
+      };
+      setApiCalls(prev => [...prev, apiCall]);
+      
+      const response = await fetch('/api/offers/prequal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ scrub_data: updatedScrubData })
+      });
+
+      const data = await response.json();
+      const duration = Date.now() - startTime;
+      
+      // Update API call with response
+      const updatedApiCall = {
+        ...apiCall,
+        status: 'success',
+        statusCode: response.status,
+        response: data,
+        duration: duration
+      };
+      setApiCalls(prev => prev.map(call => 
+        call.timestamp === apiCall.timestamp ? updatedApiCall : call
+      ));
+      
+      if (data.success) {
+        setOffers(data.data);
+        
+        // Log micro-recalculate event
+        console.log('micro_recalculate_complete', {
+          user_id: selectedUser?.id,
+          scenario: selectedUser?.scenario,
+          new_amount: loanPreferences.desired_amount,
+          new_tenure: loanPreferences.desired_tenure_months,
+          offers_count: data.data.offers.length,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        setError(data.message || 'Failed to recalculate offers');
+      }
+    } catch (err) {
+      console.error('Micro-recalculate failed:', err);
+      setError('Failed to recalculate offers');
+    } finally {
+      setIsRecalculating(false);
+    }
+  };
+
+  const handlePreferenceChange = (field, value) => {
+    setLoanPreferences(prev => ({
+      ...prev,
+      [field]: parseInt(value) || 0
+    }));
   };
 
   if (isLoading) {
@@ -236,6 +317,71 @@ const OfferList = ({ onNavigate, scrubData, fallbackData, isFallback = false, se
             message="Limited offers available based on basic information. For more accurate offers, ensure your credit bureau data is up to date."
           />
         )}
+
+        {/* Micro-Recalculate Section */}
+        <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <RefreshCw className="w-5 h-5 mr-2 text-blue-600" />
+            Adjust Your Loan Preferences
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Loan Amount
+              </label>
+              <input
+                type="number"
+                value={loanPreferences.desired_amount}
+                onChange={(e) => handlePreferenceChange('desired_amount', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bankkaro-blue focus:border-transparent"
+                placeholder="Enter amount"
+                min="10000"
+                max="5000000"
+                step="1000"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Loan Tenure (months)
+              </label>
+              <select
+                value={loanPreferences.desired_tenure_months}
+                onChange={(e) => handlePreferenceChange('desired_tenure_months', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bankkaro-blue focus:border-transparent"
+              >
+                <option value="12">12 months</option>
+                <option value="24">24 months</option>
+                <option value="36">36 months</option>
+                <option value="48">48 months</option>
+                <option value="60">60 months</option>
+                <option value="72">72 months</option>
+                <option value="84">84 months</option>
+              </select>
+            </div>
+            <div>
+              <button
+                onClick={handleMicroRecalculate}
+                disabled={isRecalculating || !loanPreferences.desired_amount}
+                className="w-full bg-bankkaro-blue hover:bg-bankkaro-blue-dark text-white font-medium py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                {isRecalculating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Recalculating...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Recalculate Offers
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            Adjust your loan amount and tenure to see updated offers from lenders
+          </p>
+        </div>
 
         {/* Stale Data Notice */}
         {isStaleData && (

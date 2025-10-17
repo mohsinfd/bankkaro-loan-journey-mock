@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { CheckCircle, XCircle, Info, ExternalLink, Star } from 'lucide-react';
+import { CheckCircle, XCircle, Info, ExternalLink, Star, AlertTriangle, RefreshCw } from 'lucide-react';
 
 const OfferCard = ({ offer, onClick, showTooltip = true, isStale = false }) => {
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showBREDetails, setShowBREDetails] = useState(false);
 
   const handleClick = () => {
     if (offer.eligible) {
@@ -20,6 +21,64 @@ const OfferCard = ({ offer, onClick, showTooltip = true, isStale = false }) => {
   const handleFeedbackClick = (e) => {
     e.stopPropagation();
     setShowFeedback(!showFeedback);
+  };
+
+  const handleBREDetailsClick = (e) => {
+    e.stopPropagation();
+    setShowBREDetails(!showBREDetails);
+  };
+
+  // Helper function to get reason code descriptions
+  const getReasonCodeDescription = (code) => {
+    const descriptions = {
+      'STALE_SCRUB': 'Credit data is older than 90 days',
+      'NTC_NOT_ACCEPTED': 'Lender does not accept No Credit History users',
+      'LOW_SCORE': 'Credit score below lender minimum',
+      'HIGH_DPD': 'Too many days past due in last 12 months',
+      'HIGH_ENQ_3M': 'Too many credit enquiries in last 3 months',
+      'LOW_INCOME': 'Monthly income below lender minimum',
+      'FOIR_EXCEEDED': 'Fixed Obligation to Income Ratio too high',
+      'OUT_OF_RANGE_AMOUNT': 'Loan amount outside lender range',
+      'OUT_OF_RANGE_TENURE': 'Loan tenure outside lender range'
+    };
+    return descriptions[code] || code;
+  };
+
+  // Helper function to get badge color and icon
+  const getBadgeInfo = () => {
+    if (isStale) {
+      return { 
+        text: 'Stale Data', 
+        color: 'bg-gray-100 text-gray-700', 
+        icon: RefreshCw,
+        description: 'Credit data needs refresh'
+      };
+    }
+    
+    if (offer.preapproved) {
+      return { 
+        text: 'Pre-Approved', 
+        color: 'bg-yellow-100 text-yellow-800', 
+        icon: Star,
+        description: 'Guaranteed approval subject to verification'
+      };
+    }
+    
+    if (offer.eligible) {
+      return { 
+        text: 'Pre-Qualified', 
+        color: 'bg-green-100 text-green-800', 
+        icon: CheckCircle,
+        description: 'Eligible based on credit assessment'
+      };
+    }
+    
+    return { 
+      text: 'Not Eligible', 
+      color: 'bg-red-100 text-red-800', 
+      icon: XCircle,
+      description: 'Does not meet lender criteria'
+    };
   };
 
   return (
@@ -45,23 +104,20 @@ const OfferCard = ({ offer, onClick, showTooltip = true, isStale = false }) => {
           <div>
             <h3 className="font-semibold text-gray-900">{offer.lender_name}</h3>
             <div className="flex items-center space-x-2">
-              {offer.preapproved ? (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                  <Star className="w-3 h-3 mr-1" />
-                  {offer.badge}
-                </span>
-              ) : offer.eligible ? (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  <CheckCircle className="w-3 h-3 mr-1" />
-                  {offer.badge}
-                </span>
-              ) : (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                  <XCircle className="w-3 h-3 mr-1" />
-                  {offer.badge}
-                </span>
-              )}
-              {offer.approval_probability && offer.eligible && (
+              {(() => {
+                const badgeInfo = getBadgeInfo();
+                const IconComponent = badgeInfo.icon;
+                return (
+                  <span 
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${badgeInfo.color}`}
+                    title={badgeInfo.description}
+                  >
+                    <IconComponent className="w-3 h-3 mr-1" />
+                    {badgeInfo.text}
+                  </span>
+                );
+              })()}
+              {offer.approval_probability && offer.eligible && !isStale && (
                 <span className="text-xs text-gray-500">
                   {offer.approval_probability}% approval chance
                 </span>
@@ -131,6 +187,55 @@ const OfferCard = ({ offer, onClick, showTooltip = true, isStale = false }) => {
           {offer.processing_fee && (
             <div className="text-sm text-gray-600 mb-4">
               Processing Fee: ₹{offer.processing_fee.toLocaleString()}
+            </div>
+          )}
+
+          {/* Reason Codes (for ineligible or with warnings) */}
+          {offer.reason_codes && offer.reason_codes.length > 0 && (
+            <div className="mb-4">
+              <button
+                onClick={handleBREDetailsClick}
+                className="text-xs text-blue-600 hover:text-blue-800 flex items-center"
+              >
+                <Info className="w-3 h-3 mr-1" />
+                {showBREDetails ? 'Hide' : 'Show'} reason codes ({offer.reason_codes.length})
+              </button>
+              
+              {showBREDetails && (
+                <div className="mt-2 space-y-1">
+                  {offer.reason_codes.map((code, index) => (
+                    <div key={index} className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
+                      {getReasonCodeDescription(code)}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* BRE Details Toggle */}
+          {offer.gates && offer.gates.length > 0 && (
+            <div className="mb-4">
+              <button
+                onClick={handleBREDetailsClick}
+                className="text-xs text-gray-600 hover:text-gray-800 flex items-center"
+              >
+                <Info className="w-3 h-3 mr-1" />
+                {showBREDetails ? 'Hide' : 'Show'} BRE evaluation details
+              </button>
+              
+              {showBREDetails && (
+                <div className="mt-2 space-y-1">
+                  {offer.gates.map((gate, index) => (
+                    <div key={index} className={`text-xs px-2 py-1 rounded flex items-center justify-between ${
+                      gate.passed ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                    }`}>
+                      <span>{gate.name}</span>
+                      <span>{gate.passed ? '✓' : '✗'}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

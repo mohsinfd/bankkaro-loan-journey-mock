@@ -23,6 +23,9 @@ export interface ScrubData {
   bureau_updated: boolean;
   data_quality: string;
   user_tag: string;
+  // Loan intent fields (added by user input)
+  desired_amount?: number;
+  desired_tenure_months?: number;
   // Derived fields
   freshness_ok: boolean;
   days_since_process: number;
@@ -290,6 +293,66 @@ const lenderRules: LenderRule[] = [
     icon: 'bajaj',
     color: '#7c3aed',
     employment_types: ['Salaried', 'Self-Employed']
+  },
+  {
+    lender_id: 'kotak_mahindra',
+    lender_name: 'Kotak Mahindra Bank',
+    accepts_ntc: false,
+    min_score: 740,
+    min_income: 35000,
+    dpd_allowed_12m: 0,
+    enquiries_3m_cap: 3,
+    foir_cap: 0.55,
+    amount_min: 75000,
+    amount_max: 750000,
+    tenure_min: 12,
+    tenure_max: 72,
+    roi_min: 11,
+    roi_max: 18,
+    priority: 8,
+    icon: 'kotak',
+    color: '#f59e0b',
+    employment_types: ['Salaried']
+  },
+  {
+    lender_id: 'axis_bank',
+    lender_name: 'Axis Bank',
+    accepts_ntc: false,
+    min_score: 730,
+    min_income: 30000,
+    dpd_allowed_12m: 0,
+    enquiries_3m_cap: 3,
+    foir_cap: 0.62,
+    amount_min: 60000,
+    amount_max: 600000,
+    tenure_min: 12,
+    tenure_max: 84,
+    roi_min: 12,
+    roi_max: 19,
+    priority: 12,
+    icon: 'axis',
+    color: '#ef4444',
+    employment_types: ['Salaried']
+  },
+  {
+    lender_id: 'flexi_loans',
+    lender_name: 'Flexi Loans',
+    accepts_ntc: true,
+    min_score: 680,
+    min_income: 15000,
+    dpd_allowed_12m: 2,
+    enquiries_3m_cap: 8,
+    foir_cap: 0.75,
+    amount_min: 5000,
+    amount_max: 150000,
+    tenure_min: 6,
+    tenure_max: 36,
+    roi_min: 18,
+    roi_max: 30,
+    priority: 25,
+    icon: 'flexi',
+    color: '#10b981',
+    employment_types: ['Salaried', 'Self-Employed', 'Business']
   }
 ];
 
