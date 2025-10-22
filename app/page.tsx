@@ -29,6 +29,7 @@ type PageData = {
   selectedUser?: any;
   isStaleData?: boolean;
   staleDays?: number;
+  skipIntentCapture?: boolean;
 };
 
 export default function Home() {
@@ -77,6 +78,7 @@ export default function Home() {
             selectedUser={pageData.selectedUser}
             isStaleData={pageData.isStaleData}
             staleDays={pageData.staleDays}
+            skipIntentCapture={pageData.skipIntentCapture}
           />
         );
       

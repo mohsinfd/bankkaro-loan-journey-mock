@@ -10,6 +10,24 @@ const ScrubLoading = ({ onNavigate, selectedUser }) => {
   const [hasError, setHasError] = useState(false);
   const [errorType, setErrorType] = useState(null);
 
+  // Quick eligibility check without full BRE evaluation
+  const checkInitialEligibility = async (scrubData) => {
+    try {
+      // Simple check based on basic criteria
+      const hasValidScore = scrubData.score && scrubData.score >= 650;
+      const hasValidIncome = scrubData.income_monthly >= 20000;
+      const hasLowDPD = scrubData.dpd_l12m <= 1;
+      const hasReasonableEnquiries = scrubData.total_enquiries_3m <= 5;
+      
+      // If user passes basic criteria, they're likely to qualify
+      return hasValidScore && hasValidIncome && hasLowDPD && hasReasonableEnquiries;
+    } catch (error) {
+      console.error('Initial eligibility check failed:', error);
+      // Default to showing intent capture if check fails
+      return true;
+    }
+  };
+
   const steps = [
     { icon: FileText, text: "Accessing credit bureau", duration: 2000 },
     { icon: TrendingUp, text: "Analyzing credit profile", duration: 2500 },
@@ -47,10 +65,24 @@ const ScrubLoading = ({ onNavigate, selectedUser }) => {
             timestamp: new Date().toISOString()
           });
           
-          // Navigate to loan intent capture
-          setTimeout(() => {
-            onNavigate('loan_intent', { scrubData: data.data, selectedUser });
-          }, 1000);
+          // Check if user is likely to qualify before asking for loan intent
+          const hasEligibleLenders = await checkInitialEligibility(data.data);
+          
+          if (hasEligibleLenders) {
+            // User likely to qualify - capture loan intent
+            setTimeout(() => {
+              onNavigate('loan_intent', { scrubData: data.data, selectedUser });
+            }, 1000);
+          } else {
+            // User unlikely to qualify - skip intent capture, show reasons directly
+            setTimeout(() => {
+              onNavigate('offer_list', { 
+                scrubData: { ...data.data, desired_amount: 100000, desired_tenure_months: 36 }, 
+                selectedUser,
+                skipIntentCapture: true
+              });
+            }, 1000);
+          }
         } else {
           setHasError(true);
           setErrorType(data.error);

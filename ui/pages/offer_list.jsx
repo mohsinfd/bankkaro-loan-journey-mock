@@ -8,7 +8,7 @@ import BREDebugPanel from '../components/BREDebugPanel';
 import APICallTracker from '../components/APICallTracker';
 import DataFlowVisualizer from '../components/DataFlowVisualizer';
 
-const OfferList = ({ onNavigate, scrubData, fallbackData, isFallback = false, selectedUser, isStaleData = false, staleDays = 0 }) => {
+const OfferList = ({ onNavigate, scrubData, fallbackData, isFallback = false, selectedUser, isStaleData = false, staleDays = 0, skipIntentCapture = false }) => {
   const [offers, setOffers] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -318,11 +318,29 @@ const OfferList = ({ onNavigate, scrubData, fallbackData, isFallback = false, se
           />
         )}
 
+        {/* Intent Capture Skipped Notice */}
+        {skipIntentCapture && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8">
+            <h2 className="text-lg font-semibold text-yellow-800 mb-2 flex items-center">
+              <Info className="w-5 h-5 mr-2" />
+              Quick Assessment Applied
+            </h2>
+            <p className="text-yellow-700 mb-4">
+              Based on your credit profile, we've applied default loan preferences (₹1,00,000 for 36 months) 
+              to show you available options. You can adjust these preferences below to see different offers.
+            </p>
+            <p className="text-sm text-yellow-600">
+              <strong>Why this happened:</strong> Your profile shows some risk factors that may limit loan options. 
+              Adjusting the amount or tenure might help you qualify for better offers.
+            </p>
+          </div>
+        )}
+
         {/* Micro-Recalculate Section */}
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <RefreshCw className="w-5 h-5 mr-2 text-blue-600" />
-            Adjust Your Loan Preferences
+            {skipIntentCapture ? 'Try Different Loan Preferences' : 'Adjust Your Loan Preferences'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div>
