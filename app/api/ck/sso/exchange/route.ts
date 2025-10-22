@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import userMock from '@/ui/data/user_mock.json';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,11 +10,22 @@ export async function POST(request: NextRequest) {
       const bkToken = `mock_bk_token_${Date.now()}`;
       const bkUserId = `BK${Math.floor(Math.random() * 1000000)}`;
       
+      // Use the selected user from the request body if available
+      const user = body.selectedUser || {
+        ck_user_id: "CK123456",
+        email: "user@cashkaro.com", 
+        phone: "+919876543210",
+        cohort: "Champion",
+        name: "User",
+        profile_complete: true,
+        last_login: new Date().toISOString()
+      };
+      
       return NextResponse.json({
         success: true,
         bk_token: bkToken,
         bk_user_id: bkUserId,
-        user: userMock,
+        user: user,
         expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
       });
     }

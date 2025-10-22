@@ -19,7 +19,8 @@ const BankKaroLogin = ({ onNavigate, selectedUser }) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            ck_token: 'mock_ck_token_123'
+            ck_token: 'mock_ck_token_123',
+            selectedUser: selectedUser
           })
         });
 
